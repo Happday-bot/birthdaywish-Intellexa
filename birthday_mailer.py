@@ -64,8 +64,8 @@ def read_excel_data(filepath):
         # Drop duplicates based on Email to avoid multiple sends to the same person
         df = df.drop_duplicates(subset=['Email'])
         
-        # Parse DOB (Format: MM/DD/YYYY)
-        df['DOB'] = pd.to_datetime(df['DOB'], format='%m/%d/%Y', errors='coerce')
+        # Parse DOB (Handles mixed formats like MM/DD/YYYY and MM-DD-YYYY)
+        df['DOB'] = pd.to_datetime(df['DOB'], errors='coerce')
         df = df.dropna(subset=['DOB'])
         
         return df
