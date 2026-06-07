@@ -3,6 +3,7 @@ import json
 import logging
 import smtplib
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import pandas as pd
@@ -218,8 +219,8 @@ def main():
         logging.warning("No data found in bdays.xlsx or file missing. Exiting.")
         return
 
-    today = datetime.now()
-    logging.info(f"Current System Date/Time: {today}")
+    today = datetime.now(ZoneInfo("Asia/Kolkata"))
+    logging.info(f"Current System Date/Time (IST): {today}")
     
     # Load state
     sent_log = load_sent_log()
