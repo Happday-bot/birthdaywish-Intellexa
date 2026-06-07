@@ -68,6 +68,7 @@ def read_excel_data(filepath):
         df['DOB'] = pd.to_datetime(df['DOB'], errors='coerce')
         df = df.dropna(subset=['DOB'])
         
+        logging.info(f"Successfully loaded {len(df)} valid employee records from {filepath}.")
         return df
     except Exception as e:
         logging.error(f"Error reading Excel file: {e}")
@@ -150,8 +151,11 @@ def process_wishes(df, today, sent_log):
     if today_str not in sent_log:
         sent_log[today_str] = []
         
+    logging.info("--- Processing Birthday Wishes ---")
     for index, row in df.iterrows():
         bday = get_next_birthday(row['DOB'], today)
+        days_until = (bday - today.date()).days
+        logging.info(f"Evaluating {row['Name']} (DOB: {row['DOB'].date()}) -> Next Birthday: {bday} ({days_until} days away)")
         
         if bday == today.date():
             email = row['Email']
@@ -176,6 +180,7 @@ def process_reminders(df, today, sent_log):
     if today_str not in sent_log:
         sent_log[today_str] = []
 
+    logging.info("--- Processing Birthday Reminders ---")
     for index, row in df.iterrows():
         bday = get_next_birthday(row['DOB'], today)
         days_until = (bday - today.date()).days
@@ -214,6 +219,7 @@ def main():
         return
 
     today = datetime.now()
+    logging.info(f"Current System Date/Time: {today}")
     
     # Load state
     sent_log = load_sent_log()
