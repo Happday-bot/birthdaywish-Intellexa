@@ -8,6 +8,8 @@ on:
 jobs:
   run-mailer:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     permissions:
       contents: write # Needed to commit state log back to the repo
 
