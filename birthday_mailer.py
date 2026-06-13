@@ -66,7 +66,7 @@ def read_excel_data(filepath):
         df = df.drop_duplicates(subset=['Email'])
         
         # Parse DOB (Handles mixed formats like MM/DD/YYYY and MM-DD-YYYY)
-        df['DOB'] = pd.to_datetime(df['DOB'], errors='coerce')
+        df['DOB'] = pd.to_datetime(df['DOB'], errors='coerce', format='mixed')
         df = df.dropna(subset=['DOB'])
         
         logging.info(f"Successfully loaded {len(df)} valid employee records from {filepath}.")
