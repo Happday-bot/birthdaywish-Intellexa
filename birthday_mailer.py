@@ -63,8 +63,20 @@ def read_excel_data(filepath):
         # Clean emails: string type, lowercase, strip whitespace
         df['Email'] = df['Email'].astype(str).str.strip().str.lower()
         
-        # Parse DOB (Handles mixed formats like MM/DD/YYYY and MM-DD-YYYY)
-        df['DOB'] = pd.to_datetime(df['DOB'], errors='coerce', format='mixed')
+        # Parse DOB (Supports both MM-DD-YYYY and MM/DD/YYYY formats)
+        df['DOB'] = (
+            df['DOB']
+            .astype(str)
+            .str.strip()
+            .str.replace("/", "-", regex=False)
+        )
+
+        df['DOB'] = pd.to_datetime(
+            df['DOB'],
+            format="%m-%d-%Y",
+            errors="coerce"
+        )
+
         df = df.dropna(subset=['DOB'])
         
         logging.info(f"Successfully loaded {len(df)} valid employee records from {filepath}.")
