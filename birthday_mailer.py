@@ -76,18 +76,23 @@ def read_excel_data(filepath):
             if pd.isna(value):
                 return pd.NaT
 
-            # Already parsed by Excel
-            if isinstance(value, (pd.Timestamp, datetime)):
-                return pd.Timestamp(value)
+            # If it's already a datetime/Timestamp, keep it
+            if isinstance(value, (datetime, pd.Timestamp)):
+                return value
 
             value = str(value).strip().replace("/", "-")
+            parts = value.split("-")
+
+            if len(parts) != 3:
+                return pd.NaT
 
             try:
-                return pd.to_datetime(
-                    value,
-                    format="%m-%d-%Y"
-                )
-            except Exception:
+                month = int(parts[0])
+                day = int(parts[1])
+                year = int(parts[2])
+
+                return datetime(year, month, day)
+            except (ValueError, TypeError):
                 return pd.NaT
 
         df["DOB"] = df["DOB"].apply(parse_dob)
