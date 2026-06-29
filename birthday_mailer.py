@@ -63,9 +63,6 @@ def read_excel_data(filepath):
         # Clean emails: string type, lowercase, strip whitespace
         df['Email'] = df['Email'].astype(str).str.strip().str.lower()
         
-        # Drop duplicates based on Email to avoid multiple sends to the same person
-        df = df.drop_duplicates(subset=['Email'])
-        
         # Parse DOB (Handles mixed formats like MM/DD/YYYY and MM-DD-YYYY)
         df['DOB'] = pd.to_datetime(df['DOB'], errors='coerce', format='mixed')
         df = df.dropna(subset=['DOB'])
