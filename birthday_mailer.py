@@ -47,40 +47,57 @@ def get_next_birthday(dob, today_date):
 
 def read_excel_data(filepath):
     """
-    Reads the Excel file, cleans the data, handles duplicates and missing values.
+    Reads the Excel file, cleans the data, handles missing values,
+    and parses DOB values stored either as Excel dates or as
+    MM/DD/YYYY / MM-DD-YYYY strings.
     """
     try:
         df = pd.read_excel(filepath)
-        
+
         # Standardize column names
         df.columns = [str(c).strip() for c in df.columns]
         if 'email' in df.columns:
             df.rename(columns={'email': 'Email'}, inplace=True)
-            
+
         # Drop rows with missing Email or DOB
         df = df.dropna(subset=['Email', 'DOB'])
-        
+
         # Clean emails: string type, lowercase, strip whitespace
         df['Email'] = df['Email'].astype(str).str.strip().str.lower()
-        
-        # Parse DOB (Supports both MM-DD-YYYY and MM/DD/YYYY formats)
-        df['DOB'] = (
-            df['DOB']
-            .astype(str)
-            .str.strip()
-            .str.replace("/", "-", regex=False)
-        )
 
-        df['DOB'] = pd.to_datetime(
-            df['DOB'],
-            format="%m-%d-%Y",
-            errors="coerce"
-        )
+        # ------------------------------------------------------------------
+        # Parse DOB
+        # Supports:
+        #   - Excel Date cells
+        #   - MM/DD/YYYY
+        #   - MM-DD-YYYY
+        # ------------------------------------------------------------------
+        def parse_dob(value):
+            if pd.isna(value):
+                return pd.NaT
 
-        df = df.dropna(subset=['DOB'])
-        
+            # Already parsed by Excel
+            if isinstance(value, (pd.Timestamp, datetime)):
+                return pd.Timestamp(value)
+
+            value = str(value).strip().replace("/", "-")
+
+            try:
+                return pd.to_datetime(
+                    value,
+                    format="%m-%d-%Y"
+                )
+            except Exception:
+                return pd.NaT
+
+        df["DOB"] = df["DOB"].apply(parse_dob)
+
+        # Remove rows whose DOB could not be parsed
+        df = df.dropna(subset=["DOB"])
+
         logging.info(f"Successfully loaded {len(df)} valid employee records from {filepath}.")
         return df
+
     except Exception as e:
         logging.error(f"Error reading Excel file: {e}")
         return pd.DataFrame()
