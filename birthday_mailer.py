@@ -16,7 +16,8 @@ load_dotenv()
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 NOTIFICATION_LIST = [
-    "230701026@rajalakshmi.edu.in"
+    "230701026@rajalakshmi.edu.in",
+    "sherind.official@gmail.com"
 ]
 
 LOG_FILE = "email_sent_log.json"
